@@ -5,58 +5,55 @@ import Color
 import Signal exposing (Signal)
 import Mouse
 import AnimationFrame
+import Focus exposing (Focus)
 
 type alias Vector =
   { x : Float
   , y : Float
   }
 
-type alias State =
-  { position : Vector }
+type alias State = Vector
 
 initial : Spring State
 initial =
   let
       spring = Spring.create 170 10
-
-      position = Spring.map2 Vector spring spring
   in
-      Spring.map State position
+      Spring.map2 Vector spring spring
+
+
+x : Focus Vector Float
+x =
+  Focus.create .x (\update v -> { v | x <- update v.x })
+
+y : Focus Vector Float
+y =
+  Focus.create .y (\update v -> { v | y <- update v.y })
+
 
 type Action
   = MoveTo Vector
   | NextFrame Float
 
+
 update : Action -> Spring State -> Spring State
 update action spring =
   case action of
     MoveTo destination ->
-      let
-          position = Spring.map .position spring
+      Spring.setDestination destination spring
 
-          newPosition = Spring.setDestination destination position
-      in
-          Spring.map State newPosition
+    NextFrame frame ->
+      spring
+      |> Spring.animateNested x frame
+      |> Spring.animateNested y frame
 
 
-    NextFrame frameRate ->
-      let
-          x = Spring.map (.position >> .x) spring
-          y = Spring.map (.position >> .y) spring
-
-          newX = Spring.animate frameRate x
-          newY = Spring.animate frameRate y
-
-          position = Spring.map2 Vector newX newY
-
-      in
-          Spring.map State position
 
 view : State -> Element
 view state =
   circle 20
   |> filled Color.red
-  |> move (state.position.x, state.position.y)
+  |> move (state.x, state.y)
   |> (\x -> [x])
   |> collage 400 400
 

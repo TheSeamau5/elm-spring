@@ -12,6 +12,7 @@ module Spring
   , setDestination
   , connectMany
   , animate
+  , animateNested
   ) where
 {-| Module for spring-based animations in Elm.
 
@@ -32,7 +33,7 @@ module Spring
 -}
 
 import Time exposing (Time)
-
+import Focus exposing (Focus)
 {-| Main Spring Type.
 A spring's behavior is defined by its stiffness and damping parameters.
 -}
@@ -146,6 +147,22 @@ connectMany destination list =
 epsilon = 0.0001
 
 
+{-| Animate a nested field inside a spring with a focus.
+-}
+animateNested : Focus a Float -> Time -> Spring a -> Spring a
+animateNested focus fpms spring =
+  let
+      fspring : Spring Float
+      fspring = map (Focus.get focus) spring
+
+      newFSpring : Spring Float
+      newFSpring = animate fpms fspring
+
+  in
+      map2 (Focus.set focus) newFSpring spring
+
+
+
 {-| Animate a spring given a framerate.
 
     animate framerate spring
@@ -161,8 +178,9 @@ animate fpms spring =
 
       a = fspring + fdamper
 
-      newX = spring.position + spring.velocity * frameRate
       newV = spring.velocity + a * frameRate
+      newX = spring.position + newV * frameRate
+
 
   in
       if

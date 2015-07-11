@@ -8,40 +8,51 @@ import Signal exposing (Signal, Address)
 import AnimationFrame
 import List
 
+import Focus exposing (Focus, (=>))
+
 import Mouse
 
 import ChatHeads.ChatHead as ChatHead
 
+
 type alias State =
-  { heads : List (Spring ChatHead.State)
+  { heads       : List (Spring ChatHead.State)
   , destination : Vector
   }
 
-(=>) = (,)
+
+x : Focus Vector Float
+x =
+  Focus.create .x (\update v -> { v | x <- update v.x })
+
+y : Focus Vector Float
+y =
+  Focus.create .y (\update v -> { v | y <- update v.y })
+
+position : Focus ChatHead.State Vector
+position =
+   Focus.create .position (\update v -> { v | position <- update v.position })
+
 
 init : List String -> State
 init sources =
   let
       spring =
-        Spring.create 170 30
+        Spring.create 170 20
 
-      position =
+      vector =
         Spring.map2 Vector spring spring
 
       chatHeads =
         List.map ChatHead.init sources
 
-      setPosition : Vector -> ChatHead.State -> ChatHead.State
-      setPosition position head =
-        { head | position <- position }
-
       setChatHead head =
-        Spring.map (flip setPosition head) position
+        Spring.map (\v -> Focus.set position v head) vector
 
       heads =
         List.map setChatHead chatHeads
   in
-      { heads = heads
+      { heads       = heads
       , destination = Vector 0 0
       }
 
@@ -66,6 +77,9 @@ type Action
   | NextFrame Float
 
 
+andMap =
+  List.map2 (<|)
+
 update : Action -> State -> State
 update action state =
   case action of
@@ -74,42 +88,23 @@ update action state =
 
     NextFrame frame ->
       let
-          positions : List (Spring Vector)
           positions =
             List.map (Spring.map .position) state.heads
 
-          setPosition : Vector -> ChatHead.State -> ChatHead.State
-          setPosition position head =
-            { head | position <- position }
+          updatePosition position =
+            position
+            |> Spring.animateNested x frame
+            |> Spring.animateNested y frame
 
-          stepPosition : Spring Vector -> Spring Vector
-          stepPosition position =
-            let
-                x =
-                  Spring.map .x position
-
-                y =
-                  Spring.map .y position
-
-                newX =
-                  Spring.animate frame x
-
-                newY =
-                  Spring.animate frame y
-
-            in
-                Spring.map2 Vector newX newY
-
-          newPositions : List (Spring Vector)
           newPositions =
-            Spring.connectMany state.destination (List.map stepPosition positions)
+            Spring.connectMany state.destination (List.map updatePosition positions)
 
-          newHeads : List (Spring ChatHead.State)
           newHeads =
-            List.map2 (Spring.map2 setPosition) newPositions state.heads
+            List.map2 (Spring.map2 (Focus.set position)) newPositions state.heads
 
       in
           { state | heads <- newHeads }
+
 
 
 view : State -> Html
