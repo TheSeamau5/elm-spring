@@ -8,7 +8,7 @@ import Signal exposing (Signal, Address)
 import AnimationFrame
 import List
 
-import Focus exposing (Focus, (=>))
+import Focus exposing (Focus)
 
 import Mouse
 
