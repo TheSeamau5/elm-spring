@@ -3,6 +3,8 @@ module Spring
   , create
   , createAt
   , current
+  , animationHasEnded
+  , animationsHaveEnded
   , map
   , map2
   , map3
@@ -21,7 +23,7 @@ module Spring
 @docs Spring, create
 
 # Query and Modify Springs
-@docs current, setDestination
+@docs current, setDestination, animationHasEnded, animationsHaveEnded
 
 # Animate Springs
 @docs animate
@@ -68,6 +70,28 @@ createAt position stiffness damping =
 -}
 current : Spring a -> a
 current {position} = position
+
+{-| Detect if a spring animation has ended.
+A spring animation is considered to have ended if the spring
+has reached its destination and has 0 velocity.
+-}
+animationHasEnded : Spring Float -> Bool
+animationHasEnded spring =
+  spring.position == spring.destination && spring.velocity == 0
+
+{-| Given a list of foci, detect if a spring animation has ended.
+A spring animation is considered to have ended if the spring
+has reached its destination and has 0 velocity and this function will
+only consider the fields defined by the foci.
+-}
+animationsHaveEnded : List (Focus a Float) -> Spring a -> Bool
+animationsHaveEnded foci spring =
+  let
+      nestedAnimationHasEnded focus =
+        animationHasEnded (map (Focus.get focus) spring)
+  in
+      List.all nestedAnimationHasEnded foci
+
 
 {-| Map a function onto a spring.
 -}
