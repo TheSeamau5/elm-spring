@@ -37,8 +37,8 @@ view context state =
           , "background-color" => toRgbaString context.color
           ]
 
-      fontSize =
-        context.size.x / 5
+      fontSize = 10
+        --min context.size.x context.size.y / 5
 
       textStyle =
           [ "position" => "absolute"

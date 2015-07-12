@@ -7,6 +7,7 @@ import List
 
 import Html exposing (Html)
 import Window
+import Task exposing (Task)
 
 import AnimationFrame
 
@@ -34,7 +35,7 @@ makeContext viewport =
       numCols = 4
 
       padding =
-        viewport.x / 10
+        5
 
       cellHeight =
         6 * (viewport.x / toFloat numCols) / 5
@@ -107,7 +108,7 @@ view : Address (Action Grid.Action) -> ApplicationState -> Html
 view address maybeState =
   case maybeState of
     Nothing ->
-      Html.text "Resize screen to start"
+      Html.text "Loading..."
 
     Just appState ->
       let
@@ -120,8 +121,25 @@ view address maybeState =
 frames =
   Signal.map (Grid.NextFrame >> ApplicationAction) AnimationFrame.frame
 
+
+startAppMailbox =
+  Signal.mailbox ()
+
+startAppTaskMailbox =
+  Signal.mailbox (Signal.send startAppMailbox.address ())
+
+port startApp : Signal (Task error ())
+port startApp =
+  startAppTaskMailbox.signal
+
+firstDimensions =
+  Signal.sampleOn startAppMailbox.signal Window.dimensions
+
+windowDimensions =
+  Signal.merge firstDimensions Window.dimensions
+
 resizes =
-  Signal.map (\(x,y) -> Resize { x = toFloat x , y = toFloat y }) Window.dimensions
+  Signal.map (\(x,y) -> Resize { x = toFloat x , y = toFloat y }) windowDimensions
 
 appMailbox =
   Signal.mailbox NoOp
