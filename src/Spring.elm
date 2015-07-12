@@ -1,6 +1,7 @@
 module Spring
   ( Spring
   , create
+  , createAt
   , current
   , map
   , map2
@@ -51,15 +52,18 @@ can be animated with the `animate` functon. You can use this as a building
 block to create more complex Springs using functions like `map` or `andMap`.
 -}
 create : Float -> Float -> Spring Float
-create stiffness damping =
+create =
+  createAt 0
+
+
+createAt : Float -> Float -> Float -> Spring Float
+createAt position stiffness damping =
   { stiffness   = stiffness
   , damping     = damping
-  , position    = 0
+  , position    = position
   , velocity    = 0
-  , destination = 0
+  , destination = position
   }
-
-
 {-| Get the current value of the spring.
 -}
 current : Spring a -> a
