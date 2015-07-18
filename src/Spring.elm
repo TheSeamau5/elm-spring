@@ -20,13 +20,13 @@ module Spring
 {-| Module for spring-based animations in Elm.
 
 # Create Springs
-@docs Spring, create
+@docs Spring, create, createAt
 
 # Query and Modify Springs
 @docs current, setDestination, animationHasEnded, animationsHaveEnded
 
 # Animate Springs
-@docs animate
+@docs animate, animateNested
 
 # Connect Springs
 @docs connect, connectMany
@@ -57,7 +57,7 @@ create : Float -> Float -> Spring Float
 create =
   createAt 0
 
-
+{-| Create a spring with a given position. -}
 createAt : Float -> Float -> Float -> Spring Float
 createAt position stiffness damping =
   { stiffness   = stiffness
@@ -66,6 +66,8 @@ createAt position stiffness damping =
   , velocity    = 0
   , destination = position
   }
+
+
 {-| Get the current value of the spring.
 -}
 current : Spring a -> a
@@ -102,6 +104,7 @@ map f spring =
            , destination <- f spring.destination
   }
 
+{-|-}
 map2 : (a -> b -> c) -> Spring a -> Spring b -> Spring c
 map2 f springA springB =
   { stiffness   = (springA.stiffness + springB.stiffness) / 2
@@ -111,7 +114,7 @@ map2 f springA springB =
   , destination = f springA.destination springB.destination
   }
 
-
+{-|-}
 map3 : (a -> b -> c -> d) -> Spring a -> Spring b -> Spring c -> Spring d
 map3 f springA springB springC =
   f
@@ -119,6 +122,7 @@ map3 f springA springB springC =
   `andMap` springB
   `andMap` springC
 
+{-|-}
 map4 : (a -> b -> c -> d -> e) -> Spring a -> Spring b -> Spring c -> Spring d -> Spring e
 map4 f springA springB springC springD =
   f
@@ -127,6 +131,7 @@ map4 f springA springB springC springD =
   `andMap` springC
   `andMap` springD
 
+{-|-}
 map5 : (a -> b -> c -> d -> e -> f) -> Spring a -> Spring b -> Spring c -> Spring d -> Spring e -> Spring f
 map5 f springA springB springC springD springE =
   f
@@ -137,6 +142,7 @@ map5 f springA springB springC springD springE =
   `andMap` springE
 
 
+{-| Chain mapping operations together -}
 andMap : Spring (a -> b) -> Spring a -> Spring b
 andMap =
   map2 (<|)
