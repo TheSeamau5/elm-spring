@@ -1,12 +1,14 @@
 {
     "version": "1.0.0",
-    "summary": "helpful summary of your project, less than 80 characters",
-    "repository": "https://github.com/USER/PROJECT.git",
+    "summary": "Physics-based Animations in Elm",
+    "repository": "https://github.com/TheSeamau5/elm-spring.git",
     "license": "BSD3",
     "source-directories": [
         "src"
     ],
-    "exposed-modules": [],
+    "exposed-modules": [
+        "Spring"
+    ],
     "dependencies": {
         "elm-lang/core": "2.1.0 <= v < 3.0.0",
         "evancz/focus": "1.0.1 <= v < 2.0.0"
