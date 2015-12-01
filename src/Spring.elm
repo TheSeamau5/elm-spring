@@ -99,9 +99,9 @@ animationsHaveEnded foci spring =
 -}
 map : (a -> b) -> Spring a -> Spring b
 map f spring =
-  { spring | position    <- f spring.position
-           , velocity    <- f spring.velocity
-           , destination <- f spring.destination
+  { spring | position    = f spring.position
+           , velocity    = f spring.velocity
+           , destination = f spring.destination
   }
 
 {-|-}
@@ -155,14 +155,14 @@ to have the first spring's position as its destination.
 -}
 connect : Spring a -> Spring a -> Spring a
 connect spring1 spring2 =
-  { spring2 | destination <- spring1.position }
+  { spring2 | destination = spring1.position }
 
 
 {-| Set the destination of a spring.
 -}
 setDestination : a -> Spring a -> Spring a
 setDestination destination spring =
-  { spring | destination <- destination }
+  { spring | destination = destination }
 
 {-| Connect multiple strings end to end. The first spring's destination will be
 set to the provided destination. The second spring's destination will be set to
@@ -220,10 +220,10 @@ animate fpms spring =
       if
           abs (newV - spring.velocity) < epsilon && abs (newX - spring.position) < epsilon
       then
-          { spring | position <- spring.destination
-                   , velocity <- 0
+          { spring | position = spring.destination
+                   , velocity = 0
           }
       else
-          { spring | position <- newX
-                   , velocity <- newV
+          { spring | position = newX
+                   , velocity = newV
           }

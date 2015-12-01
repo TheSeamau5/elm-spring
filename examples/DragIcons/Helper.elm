@@ -59,9 +59,12 @@ swap n m list =
       case (nthElement, mthElement) of
         (Just nx, Just mx) ->
           List.indexedMap (\index value ->
-            if | index == n -> mx
-               | index == m -> nx
-               | otherwise -> value
+            if index == n then
+              mx
+            else if index == m then
+              nx
+            else
+              value
           ) list
 
         _ -> list

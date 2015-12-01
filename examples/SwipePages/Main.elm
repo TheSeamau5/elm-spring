@@ -49,7 +49,7 @@ update appAction appState =
           initialState size
 
         Just state -> Just
-          { state | context <- { size = size }}
+          { state | context = { size = size }}
 
     ChildAction action ->
       case appState of
@@ -57,7 +57,7 @@ update appAction appState =
            Nothing
 
         Just state -> Just
-          { state | state <- SwipePages.update noChange state.context action state.state }
+          { state | state = SwipePages.update noChange state.context action state.state }
 
     NoOp -> appState
 
