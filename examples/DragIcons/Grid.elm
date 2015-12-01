@@ -19,11 +19,11 @@ import Signal exposing (Address)
 
 --x : Focus Vector Float
 x =
-  Focus.create .x (\update v -> { v | x <- update v.x })
+  Focus.create .x (\update v -> { v | x = update v.x })
 
 --y : Focus Vector Float
 y =
-  Focus.create .y (\update v -> { v | y <- update v.y })
+  Focus.create .y (\update v -> { v | y = update v.y })
 
 -----------
 -- STATE --
@@ -170,9 +170,12 @@ swapCells context selectedIndex selecteeIndex list =
           (Just selected, Just selectee) ->
             let
                 updateN index value =
-                  if | index == selectedIndex -> gotoCellAtIndex context selectedIndex selectee
-                     | index == selecteeIndex -> gotoCellAtIndex context selecteeIndex selected
-                     | otherwise -> value
+                  if index == selectedIndex then
+                    gotoCellAtIndex context selectedIndex selectee
+                  else if index == selecteeIndex then
+                    gotoCellAtIndex context selecteeIndex selected
+                  else
+                    value
 
             in
                 List.indexedMap updateN list
@@ -192,9 +195,12 @@ swapCellsWhileSelected context selectedIndex selecteeIndex list =
           (Just selected, Just selectee) ->
             let
                 updateN index value =
-                  if | index == selectedIndex -> gotoCellAtIndex context selectedIndex selectee
-                     | index == selecteeIndex -> selected
-                     | otherwise -> value
+                  if index == selectedIndex then
+                    gotoCellAtIndex context selectedIndex selectee
+                  else if index == selecteeIndex then
+                    selected
+                  else
+                    value
 
             in
                 List.indexedMap updateN list
@@ -213,7 +219,7 @@ gotoCellAtIndex context index state =
         |> fractionalPositionFromPosition context
 
   in
-      { state | position <- Spring.setDestination destination state.position }
+      { state | position = Spring.setDestination destination state.position }
 
 
 update : Context -> Action -> State childState -> State childState
@@ -234,11 +240,11 @@ update context action state =
                 |> findClosestIndex context
 
               updatePosition child =
-                { child | position <- Spring.setDestination fractionalPosition child.position }
+                { child | position = Spring.setDestination fractionalPosition child.position }
 
           in
-              { state | selected <- Just index
-                      , children <- updateNth index updatePosition state.children
+              { state | selected = Just index
+                      , children = updateNth index updatePosition state.children
               }
 
         Just _ ->
@@ -259,7 +265,7 @@ update context action state =
                 fractionalPositionFromPosition context adjustedPosition
 
               updatePosition child =
-                { child | position <- Spring.setDestination fractionalPosition child.position }
+                { child | position = Spring.setDestination fractionalPosition child.position }
 
               pointTowardsPosition children =
                 updateNth index updatePosition children
@@ -275,8 +281,8 @@ update context action state =
                 pointTowardsPosition >> swapLocal
 
           in
-              { state | children <- updateChildren state.children
-                      , selected <- Just closestIndex
+              { state | children = updateChildren state.children
+                      , selected = Just closestIndex
               }
 
     ReleaseAt position ->
@@ -305,8 +311,8 @@ update context action state =
               updateChildren =
                 swapLocal >> List.indexedMap anchorSelected
           in
-              { state | children <- updateChildren state.children
-                      , selected <- Nothing
+              { state | children = updateChildren state.children
+                      , selected = Nothing
               }
 
     NextFrame frame ->
@@ -317,10 +323,10 @@ update context action state =
             |> Spring.animateNested y frame
 
           updateChild child =
-            { child | position <- animatePosition child.position }
+            { child | position = animatePosition child.position }
 
       in
-          { state | children <- List.map updateChild state.children }
+          { state | children = List.map updateChild state.children }
 
 
 ----------
@@ -351,7 +357,7 @@ view viewChild address context grid =
         }
 
       selectedChildContext =
-        { childContext | isSelected <- True }
+        { childContext | isSelected = True }
 
 
 

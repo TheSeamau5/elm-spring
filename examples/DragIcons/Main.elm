@@ -91,16 +91,16 @@ update action maybeState =
               context = appState.context
 
               context' =
-                { context | size <- viewport }
+                { context | size = viewport }
           in
-              Just { appState | context <- context' }
+              Just { appState | context = context' }
 
     ApplicationAction action ->
       case maybeState of
         Nothing -> Nothing
 
         Just appState -> Just
-          { appState | state <- Grid.update appState.context action appState.state }
+          { appState | state = Grid.update appState.context action appState.state }
 
     NoOp -> maybeState
 

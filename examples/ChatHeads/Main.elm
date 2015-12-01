@@ -23,15 +23,15 @@ type alias State =
 
 x : Focus Vector Float
 x =
-  Focus.create .x (\update v -> { v | x <- update v.x })
+  Focus.create .x (\update v -> { v | x = update v.x })
 
 y : Focus Vector Float
 y =
-  Focus.create .y (\update v -> { v | y <- update v.y })
+  Focus.create .y (\update v -> { v | y = update v.y })
 
 position : Focus ChatHead.State Vector
 position =
-   Focus.create .position (\update v -> { v | position <- update v.position })
+   Focus.create .position (\update v -> { v | position = update v.position })
 
 
 init : List String -> State
@@ -84,7 +84,7 @@ update : Action -> State -> State
 update action state =
   case action of
     MoveTo destination ->
-      { state | destination <- destination }
+      { state | destination = destination }
 
     NextFrame frame ->
       let
@@ -103,7 +103,7 @@ update action state =
             List.map2 (Spring.map2 (Focus.set position)) newPositions state.heads
 
       in
-          { state | heads <- newHeads }
+          { state | heads = newHeads }
 
 
 

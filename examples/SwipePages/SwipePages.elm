@@ -43,7 +43,7 @@ update : (Context -> action -> state -> state) -> Context -> Action action -> St
 update updateChild context action state =
   case action of
     Press x ->
-      { state | lastPress <- Just x }
+      { state | lastPress = Just x }
 
     Move x ->
       case state.lastPress of
@@ -56,7 +56,7 @@ update updateChild context action state =
                 (x0 - x) / context.size.x
                 |> clamp 0 (toFloat (List.length state.children - 1))
           in
-              { state | offset <- Spring.setDestination destination state.offset }
+              { state | offset = Spring.setDestination destination state.offset }
 
 
     Release x ->
@@ -70,15 +70,15 @@ update updateChild context action state =
                 |> clamp 0 (List.length state.children - 1)
                 |> toFloat
           in
-              { state | offset    <- Spring.setDestination destination state.offset
-                      , lastPress <- Nothing
+              { state | offset    = Spring.setDestination destination state.offset
+                      , lastPress = Nothing
               }
 
     NextFrame frame ->
-      { state | offset <- Spring.animate frame state.offset }
+      { state | offset = Spring.animate frame state.offset }
 
     ChildAction index childAction ->
-      { state | children <- updateNth index (updateChild context childAction) state.children }
+      { state | children = updateNth index (updateChild context childAction) state.children }
 
 
 

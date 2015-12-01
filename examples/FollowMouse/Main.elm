@@ -24,11 +24,11 @@ initial =
 
 x : Focus Vector Float
 x =
-  Focus.create .x (\update v -> { v | x <- update v.x })
+  Focus.create .x (\update v -> { v | x = update v.x })
 
 y : Focus Vector Float
 y =
-  Focus.create .y (\update v -> { v | y <- update v.y })
+  Focus.create .y (\update v -> { v | y = update v.y })
 
 
 type Action
